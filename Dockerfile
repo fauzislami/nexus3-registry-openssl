@@ -28,7 +28,7 @@ RUN set -eux;\
 RUN sed \
     -e '/^nexus-args/ s:$:,${jetty.etc}/jetty-https.xml:' \
     -e '/^application-port/a \
-application-port-ssl=443\
+application-port-ssl=8443\
 ' \
     -i ${NEXUS_HOME}/etc/nexus-default.properties
 
@@ -37,7 +37,7 @@ RUN chown nexus:nexus ${NEXUS_HOME}/entrypoint.sh && chmod a+x ${NEXUS_HOME}/ent
 
 VOLUME [ "${NEXUS_SSL}" ]
 
-EXPOSE 443
+EXPOSE 8443
 WORKDIR ${NEXUS_HOME}
 
 ENTRYPOINT [ "./entrypoint.sh" ]
