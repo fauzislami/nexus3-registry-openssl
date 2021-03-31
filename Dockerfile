@@ -1,5 +1,13 @@
+FROM maven:3-jdk-8-alpine AS build
+
+COPY . /nexus-repository-composer/
+RUN cd /nexus-repository-composer/; \
+    mvn clean package -PbuildKar;
+
+
 FROM       sonatype/nexus3
 MAINTAINER Brad Beck <bradley.beck+docker@gmail.com>
+ARG DEPLOY_DIR=/opt/sonatype/nexus/deploy/
 
 ENV NEXUS_SSL=${NEXUS_HOME}/etc/ssl
 ENV PUBLIC_CERT=${NEXUS_SSL}/cacert.pem \
@@ -10,6 +18,7 @@ ENV PUBLIC_CERT=${NEXUS_SSL}/cacert.pem \
 ARG GOSU_VERSION=1.11
 
 USER root
+COPY --from=build /nexus-repository-composer/nexus-repository-composer/target/nexus-repository-composer-*-bundle.kar ${DEPLOY_DIR}
 
 RUN sed -e '/^enabled=1/ s/=1/=0/' -i /etc/yum/pluginconf.d/subscription-manager.conf \
  && yum -y update && yum install -y openssl libxml2 libxslt && yum clean all
